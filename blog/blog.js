@@ -1,6 +1,6 @@
 // blog.js — loads posts from JSON, renders listing and single post views
 
-const POST_IDS = ['post1'];
+const POST_IDS = ['post1', 'post2'];
 
 async function fetchPost(id) {
   const res = await fetch(`posts/${id}.json`);
@@ -94,7 +94,10 @@ function isSectionHeader(text) {
   const headers = [
     "What happened",
     "What I'm telling people",
+    "What I'm telling myself",
     "What's probably actually true",
+    "What I'm noticing about my mom",
+    "What I'm noticing about my dad",
     "What I'm feeling but not saying",
     "Open questions"
   ];
