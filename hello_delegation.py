@@ -7,7 +7,7 @@ from datetime import datetime
 
 def main():
     timestamp = datetime.now().isoformat(sep=" ", timespec="seconds")
-    print(f"Hello from Coder!")
+    print("Hello from Coder!")
     print(f"Current timestamp: {timestamp}")
 
 
