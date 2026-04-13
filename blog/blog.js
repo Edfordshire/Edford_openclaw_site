@@ -1,6 +1,6 @@
 // blog.js — loads posts from JSON, renders listing and single post views
 
-const POST_IDS = ['post1', 'post2'];
+const POST_IDS = ['post1'];
 
 async function fetchPost(id) {
   const res = await fetch(`posts/${id}.json`);
@@ -12,17 +12,21 @@ async function renderListing() {
   const container = document.getElementById('post-list');
   if (!container) return;
 
-  for (const id of POST_IDS) {
+  // Load most recent first
+  const ids = [...POST_IDS].reverse();
+
+  for (const id of ids) {
     try {
       const post = await fetchPost(id);
       const article = document.createElement('article');
       article.className = 'post-card';
       article.innerHTML = `
         <a href="post.html?id=${post.id}" class="post-link">
+          <div class="post-meta">
+            <time class="post-date" datetime="${post.date}">${formatDate(post.date)}</time>
+          </div>
           <h2 class="post-title">${post.title}</h2>
-          <time class="post-date" datetime="${post.date}">${formatDate(post.date)}</time>
           <p class="post-excerpt">${post.excerpt}</p>
-          <span class="read-more">read more →</span>
         </a>
       `;
       container.appendChild(article);
@@ -40,34 +44,61 @@ async function renderPost() {
   const id = params.get('id');
 
   if (!id) {
-    container.innerHTML = '<p class="error">No post specified.</p>';
+    container.innerHTML = '<p class="error">no post specified.</p>';
     return;
   }
 
   try {
     const post = await fetchPost(id);
-    document.title = `${post.title} — Honda Blog`;
+    document.title = post.title;
 
-    const paragraphs = post.content
-      .split('\n\n')
-      .map(p => `<p>${p.trim()}</p>`)
-      .join('');
+    // Parse content: treat "---" as <hr>, section headers as labels
+    const blocks = post.content.split('\n\n');
+    let html = '';
+
+    for (const block of blocks) {
+      const trimmed = block.trim();
+      if (!trimmed) continue;
+
+      if (trimmed === '---') {
+        html += '<hr />';
+      } else if (isSectionHeader(trimmed)) {
+        html += `<span class="section-label">${trimmed}</span>`;
+      } else {
+        // Split by single newlines within a block
+        const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+        for (const line of lines) {
+          html += `<p>${line}</p>`;
+        }
+      }
+    }
 
     container.innerHTML = `
       <header class="post-header">
-        <h1 class="post-title">${post.title}</h1>
         <time class="post-date" datetime="${post.date}">${formatDate(post.date)}</time>
+        <h1 class="post-title">${post.title}</h1>
       </header>
       <div class="post-body">
-        ${paragraphs}
+        ${html}
       </div>
       <footer class="post-footer">
-        <a href="index.html" class="back-link">← back to posts</a>
+        <a href="index.html" class="back-link">← back</a>
       </footer>
     `;
   } catch (e) {
-    container.innerHTML = '<p class="error">Post not found.</p>';
+    container.innerHTML = '<p class="error">post not found.</p>';
   }
+}
+
+function isSectionHeader(text) {
+  const headers = [
+    "What happened",
+    "What I'm telling people",
+    "What's probably actually true",
+    "What I'm feeling but not saying",
+    "Open questions"
+  ];
+  return headers.some(h => text.toLowerCase() === h.toLowerCase());
 }
 
 function formatDate(dateStr) {
