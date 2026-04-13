@@ -1,0 +1,251 @@
+/* ============================================
+   HONDA BLOG — Lo-fi Indie Style
+   Inspired by: Daniel Johnston, Snow Patrol,
+   The Terrys, Skegss
+   ============================================ */
+
+:root {
+  --bg: #f5f0e8;
+  --ink: #1a1a18;
+  --muted: #6b6355;
+  --accent: #c94a2a;
+  --accent2: #3a6b4a;
+  --border: #c8bfaa;
+  --card-bg: #fdfaf4;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-head: 'Courier New', Courier, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  min-height: 100vh;
+  padding: 0 1rem;
+  /* subtle grain texture via repeating gradient */
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.015) 2px,
+    rgba(0,0,0,0.015) 4px
+  );
+}
+
+/* ---- Layout ---- */
+
+.site-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+/* ---- Header ---- */
+
+.site-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.2rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.site-header::after {
+  content: '';
+  display: block;
+  border-bottom: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.site-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-title span {
+  color: var(--accent);
+}
+
+.site-tagline {
+  font-family: var(--font-head);
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+/* ---- Post Cards (listing) ---- */
+
+#post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.post-card {
+  background: var(--card-bg);
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  position: relative;
+  /* hand-drawn shadow */
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.post-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.post-link {
+  display: block;
+  padding: 1.4rem 1.6rem 1.2rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+  font-weight: bold;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+
+.post-date {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.7rem;
+}
+
+.post-excerpt {
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 0.9rem;
+}
+
+.read-more {
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--accent);
+}
+
+/* ---- Single Post ---- */
+
+#post-content {
+  /* sits inside site-wrapper */
+}
+
+.post-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.post-header .post-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.post-header .post-date {
+  font-size: 0.75rem;
+}
+
+.post-body p {
+  margin-bottom: 1.4rem;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.post-body p:first-child::first-letter {
+  font-size: 3.2em;
+  font-family: var(--font-head);
+  font-weight: bold;
+  float: left;
+  line-height: 0.75;
+  margin: 0.1em 0.12em 0 0;
+  color: var(--accent);
+}
+
+.post-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.back-link {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  color: var(--accent2);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  border-bottom: 1px dashed var(--accent2);
+}
+
+.back-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ---- Utility ---- */
+
+.error {
+  font-family: var(--font-head);
+  color: var(--accent);
+  padding: 1rem 0;
+}
+
+/* ---- Footer ---- */
+
+.site-footer {
+  margin-top: 4rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 480px) {
+  body {
+    padding: 0 0.75rem;
+  }
+
+  .post-link {
+    padding: 1rem 1.1rem 0.9rem;
+  }
+
+  .post-card {
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+}
