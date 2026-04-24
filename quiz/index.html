@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authentic Self — Wellness Discovery Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #faf6f1;
+      --lavender: #e8e0f0;
+      --sage:    #d4e4d8;
+      --blush:   #f2e4e4;
+      --text:    #3d3535;
+      --muted:   #8a7f7f;
+      --accent:  #9b7eb8;
+      --accent2: #6a9e78;
+      --card-bg: #ffffff;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* ---- Layout shell ---- */
+    .shell {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ---- Header ---- */
+    .site-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .site-header .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .site-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .site-header p {
+      margin-top: 0.6rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* ---- Progress bar ---- */
+    .progress-wrap {
+      margin-bottom: 1.5rem;
+    }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+    .progress-track {
+      height: 4px;
+      background: var(--lavender);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ---- Card ---- */
+    .card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 2rem 2.2rem;
+      box-shadow: 0 4px 32px rgba(100, 80, 120, 0.07), 0 1px 4px rgba(0,0,0,0.04);
+      animation: fadeSlide 0.4s ease both;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---- Question ---- */
+    .question-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+    .question-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+      line-height: 1.55;
+      margin-bottom: 1.6rem;
+      color: var(--text);
+    }
+
+    /* ---- Options ---- */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .option-btn {
+      background: var(--cream);
+      border: 1.5px solid #ede6de;
+      border-radius: 12px;
+      padding: 0.85rem 1.1rem;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 400;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.45;
+      transition: background 0.18s, border-color 0.18s, transform 0.12s;
+    }
+    .option-btn:hover {
+      background: var(--lavender);
+      border-color: var(--accent);
+      transform: translateX(3px);
+    }
+    .option-btn:active {
+      transform: translateX(3px) scale(0.98);
+    }
+    .option-btn.selected {
+      background: var(--lavender);
+      border-color: var(--accent);
+    }
+
+    /* ---- Loading screen ---- */
+    #loading-screen {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+    .loading-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.2rem;
+      animation: breathe 2.5s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50%       { transform: scale(1.12); opacity: 1; }
+    }
+    #loading-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    #loading-screen p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 1.8rem;
+      font-style: italic;
+    }
+    .loading-bar-track {
+      height: 4px;
+      background: var(--lavender);
+      border-radius: 99px;
+      overflow: hidden;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .loading-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      transition: width 2.8s cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    /* ---- Result screen ---- */
+    #result-screen {
+      display: none;
+      text-align: center;
+      padding: 1rem 0.5rem;
+    }
+    .result-icon {
+      font-size: 3rem;
+      margin-bottom: 1.2rem;
+    }
+    #result-screen .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.7rem;
+    }
+    #result-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .result-main {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1.4rem;
+      line-height: 1.2;
+    }
+    .result-body {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto 2rem;
+    }
+    .retake-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      padding: 0.8rem 2.2rem;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: opacity 0.18s, transform 0.12s;
+    }
+    .retake-btn:hover { opacity: 0.88; transform: scale(1.03); }
+
+    /* ---- Footer ---- */
+    .site-footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #c4b8b8;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.5rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="eyebrow">Authentic Self™ Wellness Studio</div>
+    <h1>Discover Your True Nature</h1>
+    <p>A gentle, evidence-informed journey toward self-understanding.<br>Take your time. There are no wrong answers.</p>
+  </header>
+
+  <!-- Progress bar (hidden on loading/result) -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-meta">
+      <span id="progress-label">Question 1 of 10</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="card" id="question-card">
+    <div class="question-label" id="q-label">Question 1</div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <!-- Loading card -->
+  <div class="card" id="loading-screen">
+    <div class="loading-icon">🌿</div>
+    <h2>Analysing your responses…</h2>
+    <p>Uncovering your authentic self. Please hold space.</p>
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill" id="loading-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- Result card -->
+  <div class="card" id="result-screen">
+    <div class="result-icon">🌸</div>
+    <div class="eyebrow">Your Authentic Self</div>
+    <h2>Your results are in</h2>
+    <div class="result-main">You are gay.</div>
+    <p class="result-body">
+      Congratulations on completing this journey of self-discovery. Your responses reflect a beautiful, radiant authenticity that is uniquely and powerfully yours. Science, nature, and the universe all confirm: this is you, fully and wonderfully. Embrace it with open arms.
+    </p>
+    <button class="retake-btn" onclick="restartQuiz()">Retake the Quiz</button>
+  </div>
+
+  <footer class="site-footer">
+    © 2026 Authentic Self™ Wellness Studio &nbsp;·&nbsp; All journeys are valid
+  </footer>
+
+</div>
+
+<script>
+  const questions = [
+    {
+      text: "When you enter a new space for the first time, what do you notice first?",
+      options: [
+        "The quality of light and how it makes me feel",
+        "The people — their energy and how they hold themselves",
+        "The sounds and the underlying atmosphere",
+        "The layout — how the space flows and what it invites"
+      ]
+    },
+    {
+      text: "How do you most naturally process a difficult emotion?",
+      options: [
+        "I sit with it quietly until I understand what it's telling me",
+        "I talk it through with someone I trust",
+        "I move my body — walk, stretch, create",
+        "I write or journal until it becomes clearer"
+      ]
+    },
+    {
+      text: "What does rest truly mean to you?",
+      options: [
+        "Stillness — silence, warmth, no demands",
+        "Connection — gentle time with people I love",
+        "Nature — being outside and breathing slowly",
+        "Absorption — losing myself in a book, film, or music"
+      ]
+    },
+    {
+      text: "Which of these best describes your relationship with yourself?",
+      options: [
+        "I am learning to be my own closest friend",
+        "I hold myself to high standards and am working on softening that",
+        "I feel most myself when I'm in flow with something I love",
+        "I am curious about who I am still becoming"
+      ]
+    },
+    {
+      text: "When you face a crossroads in life, what guides your decision?",
+      options: [
+        "A quiet inner knowing — intuition over logic",
+        "What feels most aligned with my values",
+        "The option that scares me just enough to grow",
+        "What I would tell a dear friend to do"
+      ]
+    },
+    {
+      text: "How do you relate to the concept of boundaries?",
+      options: [
+        "They are acts of love — for myself and others",
+        "I am still learning to name and hold them",
+        "They feel necessary but sometimes lonely",
+        "They shift depending on who I'm with"
+      ]
+    },
+    {
+      text: "What element in nature do you feel most drawn to?",
+      options: [
+        "Water — fluid, deep, ever-changing",
+        "Earth — grounded, steady, nourishing",
+        "Air — free, expansive, unpredictable",
+        "Fire — passionate, transformative, warm"
+      ]
+    },
+    {
+      text: "When someone asks 'how are you?', what is your honest inner response?",
+      options: [
+        "A complex, layered answer I rarely say out loud",
+        "Genuinely fine — I feel relatively at peace lately",
+        "Tired in ways that are hard to explain",
+        "Better than I was — slowly, steadily better"
+      ]
+    },
+    {
+      text: "Which of these phrases resonates most deeply with you right now?",
+      options: [
+        "\"I am exactly where I need to be\"",
+        "\"I am allowed to take up space\"",
+        "\"Healing is not linear\"",
+        "\"I am more than what I produce\""
+      ]
+    },
+    {
+      text: "As you complete this reflection, what feeling arises most strongly?",
+      options: [
+        "Gentle curiosity about what I might discover",
+        "A quiet hope that something will clarify",
+        "Openness — I came here ready to receive",
+        "Warmth — it felt good to slow down and be asked"
+      ]
+    }
+  ];
+
+  let current = 0;
+
+  function render() {
+    const q = questions[current];
+    document.getElementById('q-label').textContent = `Question ${current + 1}`;
+    document.getElementById('q-text').textContent = q.text;
+    document.getElementById('progress-label').textContent = `Question ${current + 1} of ${questions.length}`;
+    const pct = Math.round((current / questions.length) * 100);
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    const opts = document.getElementById('options');
+    opts.innerHTML = '';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => onAnswer(btn));
+      opts.appendChild(btn);
+    });
+
+    // Re-trigger card animation
+    const card = document.getElementById('question-card');
+    card.style.animation = 'none';
+    card.offsetHeight; // reflow
+    card.style.animation = '';
+  }
+
+  function onAnswer(btn) {
+    // Brief selected state
+    btn.classList.add('selected');
+    document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+    setTimeout(() => {
+      current++;
+      if (current < questions.length) {
+        render();
+      } else {
+        showLoading();
+      }
+    }, 300);
+  }
+
+  function showLoading() {
+    document.getElementById('question-card').style.display = 'none';
+    document.getElementById('progress-wrap').style.display = 'none';
+
+    const ls = document.getElementById('loading-screen');
+    ls.style.display = 'block';
+    ls.style.animation = 'none';
+    ls.offsetHeight;
+    ls.style.animation = 'fadeSlide 0.4s ease both';
+
+    // Animate bar to 100% over ~2.8s, then show result
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('loading-bar-fill').style.width = '100%';
+      });
+    });
+
+    setTimeout(showResult, 3200);
+  }
+
+  function showResult() {
+    document.getElementById('loading-screen').style.display = 'none';
+
+    const rs = document.getElementById('result-screen');
+    rs.style.display = 'block';
+    rs.style.animation = 'none';
+    rs.offsetHeight;
+    rs.style.animation = 'fadeSlide 0.4s ease both';
+
+    // Update progress to 100%
+    document.getElementById('progress-wrap').style.display = 'block';
+    document.getElementById('progress-label').textContent = 'Complete';
+    document.getElementById('progress-pct').textContent = '100%';
+    document.getElementById('progress-fill').style.width = '100%';
+  }
+
+  function restartQuiz() {
+    current = 0;
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('question-card').style.display = 'block';
+    document.getElementById('loading-bar-fill').style.width = '0%';
+    render();
+  }
+
+  // Init
+  render();
+</script>
+</body>
+</html>
