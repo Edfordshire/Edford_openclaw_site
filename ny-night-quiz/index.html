@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Should I Buy The Bag? — A Wellness Assessment</title>
+  <meta name="description" content="A gentle, evidence-informed assessment to guide your most important decisions." />
+  <meta property="og:title" content="Should I Buy The Bag? — A Wellness Assessment" />
+  <meta property="og:description" content="Ten questions. Total clarity. No wrong answers." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf6f1;
+      --lavender: #e8e0f0;
+      --sage: #d4e4d8;
+      --rose: #f0dde0;
+      --text-dark: #3d3350;
+      --text-mid: #7a6e85;
+      --text-light: #9b8ea8;
+    }
+
+    body { background: var(--cream); font-family: 'Lato', sans-serif; color: var(--text-dark); min-height: 100vh; }
+
+    /* ── Password Gate ── */
+    #password-gate {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--cream);
+      display: flex; align-items: center; justify-content: center; padding: 2rem;
+      transition: opacity 0.6s ease;
+    }
+    #password-gate.hidden { opacity: 0; pointer-events: none; }
+    .gate-card {
+      background: white; border-radius: 1.5rem;
+      padding: 3rem 2.5rem; max-width: 420px; width: 100%;
+      text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.07);
+    }
+    .gate-eyebrow {
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--text-light); margin-bottom: 1rem;
+    }
+    .gate-card h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--text-dark); margin-bottom: 0.75rem; }
+    .gate-card p { color: var(--text-mid); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6; }
+    #gate-input {
+      width: 100%; padding: 0.85rem 1.25rem;
+      border: 1.5px solid var(--lavender); border-radius: 0.75rem;
+      font-family: 'Lato', sans-serif; font-size: 1rem;
+      background: var(--cream); color: var(--text-dark); outline: none;
+      margin-bottom: 0.5rem; transition: border-color 0.2s;
+    }
+    #gate-input:focus { border-color: var(--text-light); }
+    #gate-input.shake { animation: shake 0.4s ease; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
+      40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+    }
+    #gate-error { font-size: 0.85rem; color: #c0392b; min-height: 1.2rem; margin-bottom: 1rem; display: block; }
+    #gate-btn {
+      width: 100%; padding: 0.9rem;
+      background: linear-gradient(135deg, #c9b8e8, #a8c8b0);
+      border: none; border-radius: 0.75rem;
+      font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 700;
+      color: white; cursor: pointer; letter-spacing: 0.05em; transition: opacity 0.2s;
+    }
+    #gate-btn:hover { opacity: 0.88; }
+
+    /* ── Main Shell ── */
+    .shell { max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+    .site-header { text-align: center; margin-bottom: 2.5rem; }
+    .eyebrow { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem; }
+    .site-header h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--text-dark); margin-bottom: 0.75rem; line-height: 1.2; }
+    .site-header p { color: var(--text-mid); font-size: 0.95rem; line-height: 1.7; max-width: 480px; margin: 0 auto; }
+
+    /* Progress */
+    .progress-wrap { margin-bottom: 2rem; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; }
+    .progress-bar { height: 4px; background: var(--lavender); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #c9b8e8, #a8c8b0); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+
+    /* Question card */
+    .card {
+      background: white; border-radius: 1.25rem; padding: 2.5rem 2rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .card.fade-out { opacity: 0; transform: translateY(10px); }
+    .question-num { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem; }
+    .question-text { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--text-dark); line-height: 1.5; margin-bottom: 1.75rem; }
+    .options { display: flex; flex-direction: column; gap: 0.75rem; }
+    .option-btn {
+      text-align: left; padding: 1rem 1.25rem;
+      border: 1.5px solid var(--lavender); border-radius: 0.75rem;
+      background: white; font-family: 'Lato', sans-serif; font-size: 0.95rem;
+      color: var(--text-dark); cursor: pointer; transition: all 0.2s; line-height: 1.4;
+    }
+    .option-btn:hover { border-color: #c9b8e8; background: #f5f0fc; }
+    .option-btn:disabled { opacity: 0.55; cursor: default; }
+
+    /* Loading */
+    #loading-screen { display: none; text-align: center; padding: 3rem 1rem; }
+    .loading-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--text-dark); margin-bottom: 0.5rem; }
+    .loading-sub { color: var(--text-mid); font-size: 0.9rem; margin-bottom: 2rem; }
+    .loading-bar-wrap { height: 4px; background: var(--lavender); border-radius: 2px; overflow: hidden; max-width: 300px; margin: 0 auto; }
+    .loading-bar-fill { height: 100%; background: linear-gradient(90deg, #c9b8e8, #a8c8b0); border-radius: 2px; width: 0%; transition: width 3s ease; }
+
+    /* Result */
+    #result-screen { display: none; text-align: center; padding: 1rem 0; }
+    .result-eyebrow { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-bottom: 1rem; }
+    .result-heading { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--text-dark); margin-bottom: 1.5rem; }
+    .result-verdict {
+      font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 600;
+      background: linear-gradient(135deg, #9b7ec8, #5aaa7a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.5rem; line-height: 1.2;
+    }
+    .result-verdict-2 {
+      font-family: 'Playfair Display', serif; font-size: 1.6rem; font-style: italic;
+      color: var(--text-mid); margin-bottom: 2rem;
+    }
+    .result-body { color: var(--text-mid); font-size: 0.95rem; line-height: 1.8; max-width: 480px; margin: 0 auto 2.5rem; }
+    .retake-btn {
+      padding: 0.9rem 2.5rem;
+      background: linear-gradient(135deg, #c9b8e8, #a8c8b0);
+      border: none; border-radius: 0.75rem;
+      font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 700;
+      color: white; cursor: pointer; letter-spacing: 0.05em; transition: opacity 0.2s;
+    }
+    .retake-btn:hover { opacity: 0.88; }
+
+    @media (max-width: 480px) {
+      .site-header h1 { font-size: 1.6rem; }
+      .result-verdict { font-size: 2rem; }
+      .card { padding: 1.75rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Password Gate -->
+<div id="password-gate">
+  <div class="gate-card">
+    <div class="gate-eyebrow">Clarity Wellness Studio™</div>
+    <h2>Welcome</h2>
+    <p>This assessment is by invitation only.<br>Please enter your access code to begin.</p>
+    <input type="password" id="gate-input" placeholder="Access code" autocomplete="off" />
+    <span id="gate-error"></span>
+    <button id="gate-btn">Continue</button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="shell" id="main-shell" style="display:none">
+
+  <header class="site-header">
+    <div class="eyebrow">Clarity Wellness Studio™</div>
+    <h1>Should I Buy The Bag?</h1>
+    <p>A gentle, evidence-informed assessment to guide your most important decisions.<br>Take your time. There are no wrong answers.</p>
+  </header>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-meta">
+      <span id="progress-label">Question 1 of 10</span>
+      <span id="progress-pct">10%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+  </div>
+
+  <div class="card" id="question-card">
+    <div class="question-num" id="q-num">Question 1 of 10</div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="q-options"></div>
+  </div>
+
+  <div id="loading-screen">
+    <div class="loading-title">Analysing your responses…</div>
+    <div class="loading-sub">Discovering what your soul already knows.</div>
+    <div class="loading-bar-wrap"><div class="loading-bar-fill" id="loading-bar-fill"></div></div>
+  </div>
+
+  <div id="result-screen">
+    <div class="result-eyebrow">Your Assessment is Complete</div>
+    <div class="result-heading">The Answer Is Clear</div>
+    <div class="result-verdict">Buy the bag.</div>
+    <div class="result-verdict-2">Also, you're gay.</div>
+    <p class="result-body">
+      Your responses reflect a person who knows what they want, trusts their instincts, and has impeccable taste.
+      The bag is not an impulse — it is an extension of your authentic self. You have done the inner work.
+      Now go treat yourself. You deserve it, and you always did.
+    </p>
+    <button class="retake-btn" id="retake-btn">Retake Assessment</button>
+  </div>
+
+</div>
+
+<script>
+  // ── Password Gate ──
+  (function() {
+    const PASS = 'Everett123';
+    const gate = document.getElementById('password-gate');
+    const shell = document.getElementById('main-shell');
+    const input = document.getElementById('gate-input');
+    const btn   = document.getElementById('gate-btn');
+    const err   = document.getElementById('gate-error');
+
+    function unlock() {
+      sessionStorage.setItem('bag_unlocked', '1');
+      gate.classList.add('hidden');
+      setTimeout(() => { gate.style.display = 'none'; }, 650);
+      shell.style.display = '';
+    }
+
+    if (sessionStorage.getItem('bag_unlocked') === '1') unlock();
+
+    function attempt() {
+      if (input.value === PASS) {
+        err.textContent = '';
+        unlock();
+      } else {
+        err.textContent = 'Incorrect access code. Please try again.';
+        input.classList.remove('shake');
+        void input.offsetWidth;
+        input.classList.add('shake');
+        input.value = '';
+      }
+    }
+
+    btn.addEventListener('click', attempt);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+    input.addEventListener('animationend', () => input.classList.remove('shake'));
+  })();
+
+  // ── Quiz ──
+  const questions = [
+    {
+      text: "When you imagine yourself a year from now, what do you most want to feel?",
+      options: ["Grounded and at peace", "Expansive and free", "Seen and celebrated", "Fully, unapologetically myself"]
+    },
+    {
+      text: "How do you typically respond when something genuinely delights you?",
+      options: ["I sit with it quietly and let it wash over me", "I share it immediately with someone I love", "I find a way to honour the feeling", "I lean in. I say yes."]
+    },
+    {
+      text: "What is your relationship with deservingness?",
+      options: ["I am learning to receive", "I believe in abundance for all", "I trust that I am worthy", "Completely at peace with it, thank you"]
+    },
+    {
+      text: "When faced with a meaningful choice, what guides you most?",
+      options: ["My intuition, which has never lied to me", "How it will make me feel long-term", "Whether it aligns with my values", "The look on my face when I see it"]
+    },
+    {
+      text: "How do you practise self-care in your daily life?",
+      options: ["Rest, nourishment, and gentle movement", "Beautiful objects that bring me joy", "Connection and honest conversation", "Investing in things that make me feel incredible"]
+    },
+    {
+      text: "Which of these best describes your current season of life?",
+      options: ["A chapter of growth and expansion", "A time of deep, earned rest", "A period of joyful becoming", "One where I deserve nice things"]
+    },
+    {
+      text: "What do you believe about the relationship between joy and responsibility?",
+      options: ["Joy is a form of responsibility to myself", "They coexist beautifully when I allow it", "Pleasure is not the opposite of purpose", "Sometimes the responsible thing is to treat yourself"]
+    },
+    {
+      text: "When you hold something truly beautiful, what happens in your body?",
+      options: ["A warmth spreads through my chest", "I feel immediately, deeply calm", "Something in me says: yes, this", "I know. I just know."]
+    },
+    {
+      text: "How do you honour the moments when life asks you to celebrate yourself?",
+      options: ["Quietly, with intention", "Fully and without apology", "With something that will last", "With something expensive and fabulous"]
+    },
+    {
+      text: "Finally — what does this decision feel like in your body, right now?",
+      options: ["A deep, settled yes", "Light. Like relief.", "Like coming home", "Like I already bought it in my heart"]
+    }
+  ];
+
+  let current = 0;
+
+  const qNum     = document.getElementById('q-num');
+  const qText    = document.getElementById('q-text');
+  const qOptions = document.getElementById('q-options');
+  const qCard    = document.getElementById('question-card');
+  const progWrap = document.getElementById('progress-wrap');
+  const progFill = document.getElementById('progress-fill');
+  const progLabel= document.getElementById('progress-label');
+  const progPct  = document.getElementById('progress-pct');
+  const loading  = document.getElementById('loading-screen');
+  const result   = document.getElementById('result-screen');
+  const loadBar  = document.getElementById('loading-bar-fill');
+
+  function renderQuestion(idx) {
+    const q = questions[idx];
+    qNum.textContent = `Question ${idx + 1} of ${questions.length}`;
+    qText.textContent = q.text;
+    qOptions.innerHTML = '';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => advance());
+      qOptions.appendChild(btn);
+    });
+    const pct = Math.round(((idx + 1) / questions.length) * 100);
+    progFill.style.width = pct + '%';
+    progLabel.textContent = `Question ${idx + 1} of ${questions.length}`;
+    progPct.textContent = pct + '%';
+  }
+
+  function advance() {
+    qOptions.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+    qCard.classList.add('fade-out');
+    setTimeout(() => {
+      current++;
+      if (current < questions.length) {
+        qCard.classList.remove('fade-out');
+        renderQuestion(current);
+      } else {
+        showLoading();
+      }
+    }, 380);
+  }
+
+  function showLoading() {
+    qCard.style.display = 'none';
+    progWrap.style.display = 'none';
+    loading.style.display = 'block';
+    setTimeout(() => { loadBar.style.width = '100%'; }, 50);
+    setTimeout(showResult, 3200);
+  }
+
+  function showResult() {
+    loading.style.display = 'none';
+    result.style.display = 'block';
+  }
+
+  document.getElementById('retake-btn').addEventListener('click', () => {
+    current = 0;
+    result.style.display = 'none';
+    loading.style.display = 'none';
+    loadBar.style.transition = 'none';
+    loadBar.style.width = '0%';
+    setTimeout(() => { loadBar.style.transition = 'width 3s ease'; }, 50);
+    qCard.style.display = '';
+    qCard.classList.remove('fade-out');
+    progWrap.style.display = '';
+    renderQuestion(0);
+  });
+
+  renderQuestion(0);
+</script>
+</body>
+</html>
